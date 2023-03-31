@@ -1,22 +1,24 @@
 const express = require('express');
-var fs = require('fs');
-var morgan = require('morgan');
-var path = require('path');
+const morgan = require('morgan');
 const app = express();
 
-// create a write stream (in append mode)
-var accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), {
-  flags: 'a',
-});
-
-// setup the logger
-app.use(morgan('combined', { stream: accessLogStream }));
 app.use(morgan('dev'));
-app.use((req, res, next) => {
-  console.log('In the middleware');
+
+app.use('/', (req,res,next)=>{
+  console.log('This always runs!')
   next();
 });
-app.use((req, res, next) => {
+app.use('/add-product', (req, res, next) => {
+  console.log('In another middleware');
+  res.send(
+    `<form action="/product" method="POST"><input type="text" name="title"/><button  type="submit"> Hola</button></form><h1>Hola from add product!</h1>`
+  );
+});
+app.use('/product', (req, res,next)=>{
+  console.log('from product', req.body);
+  res.redirect('/');
+});
+app.use('/', (req, res, next) => {
   console.log('In another middleware');
   res.send(`<h1>Hola from express!</h1>`);
 });
