@@ -1,7 +1,7 @@
 {
-  "name": "first-node-app",
+  "name": "nodejs-complete-guide",
   "version": "1.0.0",
-  "description": "",
+  "description": "Complete Node.js Guide",
   "main": "app.js",
   "scripts": {
     "dev": "nodemon app.js",
