@@ -1,1 +1,8 @@
-[{"title":"dfvsz"},{"title":"fdas"},{"title":"Domino"},{"title":"fdas"}]
+[
+  {
+    "title": "prueba",
+    "imageUrl": "https://i.stack.imgur.com/GsDIl.jpg",
+    "description": "Purbea",
+    "price": "123"
+  }
+]
