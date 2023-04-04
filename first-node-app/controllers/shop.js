@@ -1,5 +1,5 @@
 const createLog = require('../config/logger');
-const { Product, Cart } = require('../models');
+const { Product, Cart, CartItem } = require('../models');
 const logger = createLog('shop');
 exports.getProducts = async (req, res, next) => {
   try {
@@ -33,7 +33,7 @@ exports.getIndex = async (req, res, next) => {
       path: '/',
     });
   } catch (error) {
-      logger.error(error, { controller: 'getIndex' });
+    logger.error(error, { controller: 'getIndex' });
   }
 };
 
@@ -89,16 +89,32 @@ exports.postCart = async (req, res, next) => {
 
     return res.redirect('/cart');
   } catch (error) {
-     logger.error(error, { controller: 'postCart' });
+    logger.error(error, { controller: 'postCart' });
   }
 };
 
-exports.postCartDeleteProduct = (req, res, next) => {
-  const prodId = req.body.productId;
-  Product.findById(prodId, (product) => {
-    Cart.deleteProduct(prodId, product.price);
-    res.redirect('/cart');
-  });
+exports.postCartDeleteProduct = async (req, res, next) => {
+  try {
+    const prodId = req.body.productId;
+    let cart = await Cart.findOne({
+      where: {
+        userId: req.user.id,
+        state: false,
+      },
+      order: [['createdAt', 'DESC']],
+    });
+
+    let cartItem = await CartItem.findOne({
+      where: {
+        productId: prodId,
+        cartId: cart.id,
+      },
+    });
+    await cartItem.destroy();
+    return res.redirect('/cart');
+  } catch (error) {
+     logger.error(error, { controller: 'postCartDeleteProduct' });
+  }
 };
 
 exports.getOrders = (req, res, next) => {
