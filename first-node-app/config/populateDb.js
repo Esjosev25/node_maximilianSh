@@ -12,13 +12,13 @@ const associationsDb = async () => {
 };
 const bulkDb = async () => {
   try {
-    const user = await models.User.findOne({
+    let user = await models.User.findOne({
       where: {
         email: process.env.FIRST_EMAIL,
       },
     });
     if (!user) {
-      const user = await models.User.create({
+      user = await models.User.create({
         name: process.env.FIRST_USER,
         email: process.env.FIRST_EMAIL,
       });
@@ -38,4 +38,12 @@ const populateDB = async () => {
     logger.error(error);
   }
 };
-module.exports = { populateDB };
+const getFirstUserDb = async () => {
+  const user = await models.User.findOne({
+    where: {
+      email: process.env.FIRST_EMAIL,
+    },
+  });
+  return user;
+};
+module.exports = { populateDB, getFirstUserDb };
