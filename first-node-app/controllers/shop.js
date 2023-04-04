@@ -1,6 +1,8 @@
 const Product = require('../models/product');
 const Cart = require('../models/cart');
 
+const createLog = require('../config/logger');
+const logger = createLog('shop');
 exports.getProducts = (req, res, next) => {
   Product.fetchAll()
     .then(([rows]) => {
@@ -13,17 +15,14 @@ exports.getProducts = (req, res, next) => {
     .catch(err => console.log(err));
 };
 
-exports.getProduct = (req, res, next) => {
+exports.getProduct = async (req, res, next) => {
   const prodId = req.params.productId;
-  Product.findById(prodId)
-    .then(([product]) => {
-      res.render('shop/product-detail', {
-        product: product[0],
-        pageTitle: product.title,
-        path: '/products'
-      });
-    })
-    .catch(err => console.log(err));
+  const product =  await Product.findByPk(prodId);
+    res.render('shop/product-detail', {
+      product: product,
+      pageTitle: product.title,
+      path: '/products',
+    });
 };
 
 exports.getIndex = (req, res, next) => {
