@@ -1,3 +1,4 @@
+require('dotenv').config();
 const path = require('path');
 const express = require('express');
 const morgan = require('morgan');
@@ -28,11 +29,8 @@ app.use(shopRoutes);
 
 app.use(errorController.get404);
 
-
-
-
 populateDB();
-console.log('lol')
+
 const port = process.env.PORT || 3000;
 app.listen(port);
 logger.info(`Server is running on PORT ${port}`);

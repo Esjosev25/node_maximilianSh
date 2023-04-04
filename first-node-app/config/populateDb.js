@@ -12,11 +12,15 @@ const associationsDb = async () => {
 };
 const bulkDb = async () => {
   try {
-    const user = await models.User.findByPk(1);
+    const user = await models.User.findOne({
+      where: {
+        email: process.env.FIRST_EMAIL,
+      },
+    });
     if (!user) {
       const user = await models.User.create({
-        name: 'Estuardo',
-        email: 'test@test.com',
+        name: process.env.FIRST_USER,
+        email: process.env.FIRST_EMAIL,
       });
       user.save();
     }
