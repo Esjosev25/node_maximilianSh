@@ -8,11 +8,9 @@ const createLog = (controllerName) =>
       format.timestamp(),
       format.printf(
         (info) =>
-          `${
-            info.timestamp
-          } ${controllerName.toUpperCase()} [${info.level.toUpperCase()}] ${
-            info.message
-          }`
+          `${info.timestamp} ${controllerName.toUpperCase()} - ${
+            info.controller || ''
+          } [${info.level.toUpperCase()}] ${info.message}`
       )
     ),
     transports: [

@@ -1,28 +1,33 @@
-const models = require('../models');
+const { Product, User, Cart, CartItem } = require('../models');
 const sequelize = require('./database');
 
 const createLog = require('./logger');
 const logger = createLog('PopulateDb');
 
 const associationsDb = async () => {
-  models.Product.belongsTo(models.User, {
+  Product.belongsTo(User, {
     constraints: true,
     onDelete: 'CASCADE',
   });
+  User.hasMany(Product);
+  User.hasOne(Cart);
+  Cart.belongsTo(User);
+  Cart.belongsToMany(Product, { through: CartItem });
+  Product.belongsToMany(Cart, { through: CartItem });
 };
 const bulkDb = async () => {
   try {
-    let user = await models.User.findOne({
+    let user = await User.findOne({
       where: {
         email: process.env.FIRST_EMAIL,
       },
     });
     if (!user) {
-      user = await models.User.create({
+      user = await User.create({
         name: process.env.FIRST_USER,
         email: process.env.FIRST_EMAIL,
       });
-      user.save();
+      
     }
   } catch (error) {
     logger.error(error);
@@ -39,7 +44,7 @@ const populateDB = async () => {
   }
 };
 const getFirstUserDb = async () => {
-  const user = await models.User.findOne({
+  const user = await User.findOne({
     where: {
       email: process.env.FIRST_EMAIL,
     },
