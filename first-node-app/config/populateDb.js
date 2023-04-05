@@ -1,4 +1,4 @@
-const { Product, User, Cart, CartItem } = require('../models');
+const { Product, User, Cart, CartItem, Order, OrderItem } = require('../models');
 const sequelize = require('./database');
 
 const createLog = require('./logger');
@@ -14,6 +14,9 @@ const associationsDb = async () => {
   Cart.belongsTo(User);
   Cart.belongsToMany(Product, { through: CartItem });
   Product.belongsToMany(Cart, { through: CartItem });
+  Order.belongsTo(User);
+  User.hasMany(Order);
+  Order.belongsToMany(Product, { through: OrderItem });
 };
 const bulkDb = async () => {
   try {

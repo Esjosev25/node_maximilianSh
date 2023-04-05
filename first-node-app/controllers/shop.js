@@ -1,5 +1,5 @@
 const createLog = require('../config/logger');
-const { Product, Cart, CartItem } = require('../models');
+const { Product, Cart, CartItem, Order, OrderItem } = require('../models');
 const logger = createLog('shop');
 exports.getProducts = async (req, res, next) => {
   try {
@@ -117,13 +117,46 @@ exports.postCartDeleteProduct = async (req, res, next) => {
   }
 };
 
-exports.getOrders = (req, res, next) => {
-  res.render('shop/orders', {
+exports.getOrders = async (req, res, next) => {
+  const user = req.user;
+  const orders =await user.getOrders({
+    include: [{model:Product}],
+    order: [
+      ['createdAt', 'DESC'],
+      ['state', 'DESC'],
+    ],
+  });
+  return res.render('shop/orders', {
     path: '/orders',
     pageTitle: 'Your Orders',
+    orders
   });
 };
 
+exports.postOrders = async (req, res, next) => {
+  try {
+    const user = req.user;
+    const cart = await user.getCart({
+      where: { state: false },
+      order: [['createdAt', 'DESC']],
+    });
+    const products = await cart.getProducts();
+    const order = await user.createOrder({ state: false });
+    order.addProducts(
+      products.map((product) => {
+        product.orderItem = { quantity: product.cartItem.quantity };
+        return product;
+      })
+    );
+    await order.save();
+    await cart.update({ state: true });
+    await cart.save();
+    return res.redirect('/orders');
+  } catch (error) {
+     logger.error(error, { controller: 'postOrders' });
+  }
+  
+};
 exports.getCheckout = (req, res, next) => {
   res.render('shop/checkout', {
     path: '/checkout',
