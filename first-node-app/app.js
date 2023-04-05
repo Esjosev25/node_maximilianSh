@@ -11,6 +11,8 @@ const errorController = require('./controllers/error');
 
 const { populateDB, getFirstUserDb } = require('./config/populateDb');
 
+const { connectMongoDB } = require('./config/mongoDB');
+
 const app = express();
 
 app.set('view engine', 'ejs');
@@ -38,7 +40,8 @@ app.use(shopRoutes);
 
 app.use(errorController.get404);
 
-populateDB()
+
+connectMongoDB()
   .then(() => {
     const port = process.env.PORT || 3000;
     app.listen(port);
