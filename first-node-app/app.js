@@ -24,16 +24,7 @@ const shopRoutes = require('./routes/shop');
 app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(async (req, res, next) => {
-  const user = await getFirstUserDb();
-  if (!user) {
-    logger.error('First User couldnt be loaded');
-    process.exit(1);
-  }
 
-  req.user = user;
-  next();
-});
 
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);

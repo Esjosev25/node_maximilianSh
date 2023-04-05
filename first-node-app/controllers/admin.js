@@ -12,14 +12,13 @@ exports.getAddProduct = (req, res, next) => {
 exports.postAddProduct = async (req, res, next) => {
   try {
     const { title, imageUrl, price, description } = req.body;
-    const product = await Product.create({
+    const product = new Product({
       title,
       imageUrl,
       price,
       description,
-      userId: req.user.id,
     });
-    product.save();
+    await product.save();
     logger.info(`Producto ${product.id}: ${product.title} fue añadido`, {
       controller: 'postAddProduct',
     });
@@ -36,7 +35,7 @@ exports.getEditProduct = async (req, res, next) => {
       return res.redirect('/');
     }
     const prodId = req.params.productId;
-    const product = await Product.findByPk(prodId);
+    const product = await Product.findById(prodId);
     if (!product) return res.redirect('/');
     return res.render('admin/edit-product', {
       pageTitle: 'Edit Product',
@@ -52,14 +51,14 @@ exports.getEditProduct = async (req, res, next) => {
 exports.postEditProduct = async (req, res, next) => {
   try {
     const { productId, title, price, imageUrl, description } = req.body;
-    const product = await Product.findByPk(productId);
+    const product = await Product.findById(productId);
     if (!product) return res.redirect('/');
     product.title = title;
     product.description = description;
     product.imageUrl = imageUrl;
     product.price = price;
     product.save();
-    logger.info(`Producto ${prodId}:  fue actualizado`, {
+    logger.info(`Producto ${productId}:  fue actualizado`, {
       controller: 'postEditProduct',
     });
     return res.redirect('/admin/products');
@@ -70,7 +69,7 @@ exports.postEditProduct = async (req, res, next) => {
 
 exports.getProducts = async (req, res, next) => {
   try {
-    const products = await Product.findAll();
+    const products = await Product.find();
     return res.render('admin/products', {
       prods: products,
       pageTitle: 'Admin Products',
@@ -84,11 +83,7 @@ exports.getProducts = async (req, res, next) => {
 exports.postDeleteProduct = async (req, res, next) => {
   try {
     const prodId = req.body.productId;
-    await Product.destroy({
-      where: {
-        id: prodId,
-      },
-    });
+    await Product.findByIdAndRemove(prodId);
     logger.info(`Producto ${prodId}:  fue eliminado`, {
       controller: 'postDeleteProduct',
     });

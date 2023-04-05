@@ -5,8 +5,14 @@ const logger = createLog('MongoDB');
 const connectDB = async () => {
   try {
     mongoose.set('strictQuery', false);
-    const mongoUrl = `mongodb://${process.env.MONGO_USERNAME}:${process.env.MONGO_PASSWORD}@${process.env.MONGO_DB_HOST}:${process.env.MONGO_DB_PORT}`;
-    await mongoose.connect(mongoUrl);
+    const mongoUrl = `mongodb://${process.env.MONGO_DB_HOST}:${process.env.MONGO_DB_PORT}/${process.env.MONGO_DB_NAME}`;
+    await mongoose.connect(mongoUrl, {
+      authSource: 'admin',
+      user: process.env.MONGO_USERNAME,
+      pass: process.env.MONGO_PASSWORD,
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
     logger.info('Mongo DB Connected');
   } catch (err) {
     logger.error(err);
